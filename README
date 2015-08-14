@@ -1,0 +1,20 @@
+StealthOverlay - a World of Warcraft (1.12.1) AddOn
+===================================================
+
+Installation:
+
+Put "StealthOverlay" folder into ".../World of Warcraft/Interface/AddOns/".
+Create AddOns folder if necessary
+
+Features:
+- slowly dims your screen when you enter Stealth
+- allows you to quickly notice that you have been kicked out of Stealth
+- makes cof- Ok, this one is a lie. It doesn't make any coffee, yet.
+
+Known Issues:
+- Doesn't make coffee
+- the "/stealth" slash command sometimes will freeze your client
+- At the moment AddOnn doesn't check if you're a Rogue, expect weird shit playing any other class that has stances (Warrior, Druid, Your mo-)
+
+Thanks to:
+- the guy that make exactly same addon for TBC with same or very similar name (somewhere on curse.com - now I'm unable to find it, hence why I wrote my own)

@@ -1,0 +1,32 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script File="StealthOverlay.lua"/>
+	<Frame name="StealthOverlay" frameStrata="BACKGROUND" hidden="true" alpha="1">
+		<Scripts>
+			<OnLoad>
+                StealthOverlay_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				StealthOverlay_OnEvent(event, arg1, arg2);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	<Frame name="StealthOverlayFrame" frameStrata="BACKGROUND" hidden="true" alpha="0">
+		<Scripts>
+			<OnLoad>
+				this.timer = 0;
+				this.onload = false;
+				this.display = false;
+			</OnLoad>
+			<OnUpdate>
+				StealthOverlay_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+		<Size>
+			<RelDimension x="1" y="1"/>
+		</Size>	
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\AddOns\StealthOverlay\bg"></Backdrop>
+	</Frame>
+</Ui>
