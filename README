@@ -6,6 +6,19 @@ Installation:
 Put "StealthOverlay" folder into ".../World of Warcraft/Interface/AddOns/".
 Create AddOns folder if necessary
 
+After Installation directory tree should look like the following
+
+'''
+World of Warcraft
+  |- Interface
+     |- AddOns
+        |- StealthOverlay
+           |- bg.tga
+           |- StealthOverlay.lua
+           |- StealthOverlay.toc
+           `- StealthOverlay.xml
+'''
+
 Features:
 - slowly dims your screen when you enter Stealth
 - allows you to quickly notice that you have been kicked out of Stealth
