@@ -13,8 +13,6 @@ Features:
 
 Known Issues:
 - Doesn't make coffee
-- the "/stealth" slash command sometimes will freeze your client
-- At the moment AddOnn doesn't check if you're a Rogue, expect weird shit playing any other class that has stances (Warrior, Druid, Your mo-)
 
 Thanks to:
 - the guy that make exactly same addon for TBC with same or very similar name (somewhere on curse.com - now I'm unable to find it, hence why I wrote my own)
