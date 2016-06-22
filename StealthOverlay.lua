@@ -1,55 +1,55 @@
 -- CONFIG SECTION --
 STEALTHOVERLAY_SHOWTIME = 2;
 STEALTHOVERLAY_FADETIME = 0.05;
+STEALTHOVERLAY_CANCELTIME = 3;
 -- END --
 
-SlashCmdList["STEALTHOVERLAY_SLASHCMD"] = function(msg)
-	if ( msg == "" ) then
-		StealthOverlay_Stealth(3);
-	else
-		StealthOverlay_Stealth(tonumber(msg));
-	end
-end
-SLASH_STEALTHOVERLAY_SLASHCMD1 = '/caststealth'
-SLASH_STEALTHOVERLAY_SLASHCMD2 = '/stealth'
-
 function StealthOverlay_OnLoad()
+
+	local localizedClass, class = UnitClass("player");
+	class = strupper(class);
+	if ( class ~= "ROGUE" and class ~= "DRUID" ) then
+		DisableAddOn("StealthOverlay");
+		ReloadUI();
+		return
+	end
+	
 	this:RegisterEvent("PLAYER_ENTERING_WORLD");
 	this:RegisterEvent("COMBAT_TEXT_UPDATE"); -- from Blizzard_CombatText.lua
-	DEFAULT_CHAT_FRAME:AddMessage("StealthOverlay loaded");
+
+	SlashCmdList["STEALTHOVERLAY_SLASHCMD"] = function(msg)
+		if ( msg == "" ) then
+			StealthOverlay_Stealth(STEALTHOVERLAY_CANCELTIME);
+		else
+			StealthOverlay_Stealth(tonumber(msg));
+		end
+	end
+	
+	SLASH_STEALTHOVERLAY_SLASHCMD1 = '/caststealth'
+	SLASH_STEALTHOVERLAY_SLASHCMD2 = '/stealth'
+	
 end
 
 function StealthOverlay_OnEvent(event, arg1, arg2)
 	
 	if event == "COMBAT_TEXT_UPDATE" and arg1 == "AURA_START" and arg2 == "Stealth" then
-		StealthOverlayFrame.display=true;
-		StealthOverlayFrame.onload=false;
-		StealthOverlayFrame.timer=STEALTHOVERLAY_SHOWTIME;
+		StealthOverlayFrame.display = true;
+		StealthOverlayFrame.onload = false;
+		StealthOverlayFrame.timer = STEALTHOVERLAY_SHOWTIME;
 		StealthOverlayFrame:SetAlpha(0);
 		StealthOverlayFrame:Show();
 	end
 	
 	if event == "COMBAT_TEXT_UPDATE" and arg1 == "AURA_END" and arg2 == "Stealth" then
-		StealthOverlayFrame.display=false;
-		StealthOverlayFrame.onload=false;
-		StealthOverlayFrame.timer=STEALTHOVERLAY_FADETIME; 
+		StealthOverlayFrame.display = false;
+		StealthOverlayFrame.onload = false;
+		StealthOverlayFrame.timer = STEALTHOVERLAY_FADETIME; 
 		StealthOverlayFrame:SetAlpha(1);
 		StealthOverlayFrame:Show();
 	end
 	
 	if event == "PLAYER_ENTERING_WORLD" then
-		--[[local icon, i
-		for i=0,26 do -- from BuffFrame.xml
-			icon = UnitBuff("player", i)
-			if icon == "Interface\\Icons\\Ability_Stealth" then
-				StealthOverlayFrame.display=true;
-				StealthOverlayFrame.onload=true;
-				StealthOverlayFrame.timer=STEALTHOVERLAY_SHOWTIME;
-				StealthOverlayFrame:SetAlpha(1);
-				StealthOverlayFrame:Show();
-			end
-		end]]--
-		local _,_,isActive=GetShapeshiftFormInfo(1);
+		local texture, name, isActive, isCastable = GetShapeshiftFormInfo(1);
 		if isActive then
 			StealthOverlayFrame.display=true;
 			StealthOverlayFrame.onload=true;
@@ -62,28 +62,21 @@ function StealthOverlay_OnEvent(event, arg1, arg2)
 end
 
 function StealthOverlay_Stealth(t)
-	local _,_,s=GetShapeshiftFormInfo(1);
-	local i=1
-	if not s then
-		__LST = time()
+	if not t then t = STEALTHOVERLAY_CANCELTIME; end
+	
+	local texture, name, isActive, isCastable = GetShapeshiftFormInfo(1);
+	local timeNow = time();
+	
+	if not isActive then
+		__LST = timeNow;
 		CastSpellByName("Stealth");
 	else
 		if __LST ~= nil then
-			if __LST+t < time() then
-				while UnitBuff("player",i) do
-					if strfind(UnitBuff("player",i),"Stealth") then
-						CancelPlayerBuff(i-1);
-						break
-					end
-				end
+			if __LST+t < timeNow then
+				CastSpellByName("Stealth");
 			end
 		else
-			while UnitBuff("player",i) do
-				if strfind(UnitBuff("player",i),"Stealth") then
-					CancelPlayerBuff(i-1);
-					break
-				end
-			end
+			CastSpellByName("Stealth");
 		end
 	end
 end

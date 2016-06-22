@@ -1,7 +1,7 @@
 ## Interface: 11200
 ## Title: StealthOverlay
-## Notes: Adds fullscreen background texture while in stealth or prowl
+## Notes: Adds fullscreen background texture while in stealth
 ## Author: moh
-## Version: 1.0
+## Version: 1.1
 
 StealthOverlay.xml
