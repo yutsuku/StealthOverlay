@@ -2,12 +2,14 @@
 STEALTHOVERLAY_SHOWTIME = 2;
 STEALTHOVERLAY_FADETIME = 0.05;
 STEALTHOVERLAY_CANCELTIME = 3;
+local L_STEALTH = "Stealth";
+local L_PROWL = "Prowl";
 -- END --
 
-function StealthOverlay_OnLoad()
+local localizedClass, class = UnitClass("player");
+class = strupper(class);
 
-	local localizedClass, class = UnitClass("player");
-	class = strupper(class);
+function StealthOverlay_OnLoad()
 	if ( class ~= "ROGUE" and class ~= "DRUID" ) then
 		DisableAddOn("StealthOverlay");
 		ReloadUI();
@@ -27,12 +29,13 @@ function StealthOverlay_OnLoad()
 	
 	SLASH_STEALTHOVERLAY_SLASHCMD1 = '/caststealth'
 	SLASH_STEALTHOVERLAY_SLASHCMD2 = '/stealth'
+	SLASH_STEALTHOVERLAY_SLASHCMD3 = '/prowl'
 	
 end
 
 function StealthOverlay_OnEvent(event, arg1, arg2)
 	
-	if event == "COMBAT_TEXT_UPDATE" and arg1 == "AURA_START" and arg2 == "Stealth" then
+	if (event == "COMBAT_TEXT_UPDATE" and arg1 == "AURA_START") and (arg2 == L_STEALTH or arg2 == L_PROWL) then
 		StealthOverlayFrame.display = true;
 		StealthOverlayFrame.onload = false;
 		StealthOverlayFrame.timer = STEALTHOVERLAY_SHOWTIME;
@@ -40,7 +43,7 @@ function StealthOverlay_OnEvent(event, arg1, arg2)
 		StealthOverlayFrame:Show();
 	end
 	
-	if event == "COMBAT_TEXT_UPDATE" and arg1 == "AURA_END" and arg2 == "Stealth" then
+	if (event == "COMBAT_TEXT_UPDATE" and arg1 == "AURA_END") and (arg2 == L_STEALTH or arg2 == L_PROWL) then
 		StealthOverlayFrame.display = false;
 		StealthOverlayFrame.onload = false;
 		StealthOverlayFrame.timer = STEALTHOVERLAY_FADETIME; 
@@ -49,34 +52,79 @@ function StealthOverlay_OnEvent(event, arg1, arg2)
 	end
 	
 	if event == "PLAYER_ENTERING_WORLD" then
-		local texture, name, isActive, isCastable = GetShapeshiftFormInfo(1);
-		if isActive then
-			StealthOverlayFrame.display=true;
-			StealthOverlayFrame.onload=true;
-			StealthOverlayFrame.timer=STEALTHOVERLAY_SHOWTIME;
-			StealthOverlayFrame:SetAlpha(1);
-			StealthOverlayFrame:Show();
+		if ( class == "ROGUE" ) then
+			local texture, name, isActive, isCastable = GetShapeshiftFormInfo(1);
+			if isActive then
+				StealthOverlayFrame.display=true;
+				StealthOverlayFrame.onload=true;
+				StealthOverlayFrame.timer=STEALTHOVERLAY_SHOWTIME;
+				StealthOverlayFrame:SetAlpha(1);
+				StealthOverlayFrame:Show();
+			end
+		elseif ( class == "DRUID" ) then
+			if ( StealthOverlay_HasAura("player", L_PROWL) ) then
+				StealthOverlayFrame.display=true;
+				StealthOverlayFrame.onload=true;
+				StealthOverlayFrame.timer=STEALTHOVERLAY_SHOWTIME;
+				StealthOverlayFrame:SetAlpha(1);
+				StealthOverlayFrame:Show();
+			end
 		end
 	end
 	
 end
 
-function StealthOverlay_Stealth(t)
-	if not t then t = STEALTHOVERLAY_CANCELTIME; end
-	
-	local texture, name, isActive, isCastable = GetShapeshiftFormInfo(1);
-	local timeNow = time();
-	
-	if not isActive then
-		__LST = timeNow;
-		CastSpellByName("Stealth");
-	else
-		if __LST ~= nil then
-			if __LST+t < timeNow then
-				CastSpellByName("Stealth");
+if ( class == "DRUID" ) then
+	CreateFrame("GameTooltip", "StealthOverlayScanner", nil, "GameTooltipTemplate");
+	StealthOverlayScanner:SetOwner(WorldFrame, "ANCHOR_NONE");
+
+	function StealthOverlay_HasAura(unit, name)
+		StealthOverlayScanner:ClearLines()
+		for i=1,32 do
+			StealthOverlayScanner:SetUnitBuff(unit,i)
+			if ( StealthOverlayScannerTextLeft1:GetText() == name ) then 
+				return true
 			end
+		end
+	end
+	
+	function StealthOverlay_Stealth(t)
+		if not t then t = STEALTHOVERLAY_CANCELTIME; end
+		
+		local isActive = StealthOverlay_HasAura("player", L_PROWL);
+		local timeNow = time();
+		
+		if not isActive then
+			__LST = timeNow;
+			CastSpellByName(L_PROWL);
 		else
-			CastSpellByName("Stealth");
+			if __LST ~= nil then
+				if __LST+t < timeNow then
+					CastSpellByName(L_PROWL);
+				end
+			else
+				CastSpellByName(L_PROWL);
+			end
+		end
+	end
+elseif ( class == "ROGUE" ) then
+	function StealthOverlay_Stealth(t)
+		if not t then t = STEALTHOVERLAY_CANCELTIME; end
+		
+		local texture, name, isActive, isCastable = GetShapeshiftFormInfo(1);
+		local timeNow = time();
+		
+		if not isActive then
+			__LST = timeNow;
+			CastSpellByName(L_STEALTH);
+		else
+			if __LST ~= nil then
+				if __LST+t < timeNow then
+					CastSpellByName(L_STEALTH);
+				end
+			else
+				CastSpellByName(L_STEALTH);
+			end
 		end
 	end
 end
